@@ -8,6 +8,7 @@ from ..core.jenkins import JenkinsMaster
 from ..core.ssh import SSHKeyManager
 from ..core.agent import JenkinsAgent
 from ..core.agent_config import JenkinsAgentConfigurator
+from ..cli.logo import display_logo
 
 # Install rich traceback handling
 install()
@@ -349,6 +350,7 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
             console.print(f"{status} Agent {i}: {message}")
             
         # Final summary
+        display_logo()
         console.print("\n[bold green]Jenkins infrastructure setup complete![/bold green]")
         console.print(f"Access Jenkins at: http://localhost:{jenkins_master.host_port}")
         console.print(f"Username: {admin_user}")
