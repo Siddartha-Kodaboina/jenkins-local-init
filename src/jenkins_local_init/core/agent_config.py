@@ -118,6 +118,70 @@ class JenkinsAgentConfigurator:
         except Exception as e:
             return False, f"Failed to configure credentials: {str(e)}"
 
+    def delete_agent(self, agent_name: str) -> Tuple[bool, str]:
+        """Delete a Jenkins agent from the master.
+        
+        Args:
+            agent_name: The name of the agent to delete
+            
+        Returns:
+            Tuple of (success, message)
+        """
+        try:
+            session = requests.Session()
+            session.auth = (self.username, self.password)
+            
+            # Check if agent exists
+            check_response = session.get(f"{self.jenkins_url}/computer/{agent_name}/api/json")
+            if check_response.status_code != 200:
+                return False, f"Agent {agent_name} does not exist or cannot be accessed"
+            
+            # Get crumb for CSRF protection
+            crumb_response = session.get(f"{self.jenkins_url}/crumbIssuer/api/json")
+            if crumb_response.status_code != 200:
+                return False, f"Failed to get crumb: {crumb_response.text[:200]}"
+            
+            crumb_data = crumb_response.json()
+            crumb_field = crumb_data['crumbRequestField']
+            crumb = crumb_data['crumb']
+            
+            # Delete the agent
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                crumb_field: crumb
+            }
+            
+            delete_response = session.post(
+                f"{self.jenkins_url}/computer/{agent_name}/doDelete",
+                headers=headers
+            )
+            
+            if delete_response.status_code in [200, 302]:
+                return True, f"Agent {agent_name} deleted successfully"
+            else:
+                return False, f"Failed to delete agent {agent_name}: {delete_response.text[:200]}"
+                
+        except Exception as e:
+            return False, f"Failed to delete agent {agent_name}: {str(e)}"
+    
+    def agent_exists(self, agent_name: str) -> bool:
+        """Check if an agent exists in Jenkins.
+        
+        Args:
+            agent_name: The name of the agent to check
+            
+        Returns:
+            True if the agent exists, False otherwise
+        """
+        try:
+            session = requests.Session()
+            session.auth = (self.username, self.password)
+            
+            response = session.get(f"{self.jenkins_url}/computer/{agent_name}/api/json")
+            return response.status_code == 200
+        except Exception:
+            return False
+    
     def configure_agent(self, agent_name: str, host: str = "jenkins-local-agent-1", port: int = 22) -> Tuple[bool, str]:
         """Configure Jenkins agent using SSH."""
         try:

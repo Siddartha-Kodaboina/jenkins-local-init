@@ -218,22 +218,81 @@ class JenkinsAgent:
         return agents
 
     def remove_agent(self, index: int) -> Tuple[bool, str]:
-        """Remove a specific agent container."""
-        agent_name = self._get_agent_name(index)
+        """Remove a specific agent from both Docker and Jenkins.
         
-        # Stop container first
-        stop_success, _ = self.docker.run_command(['docker', 'stop', agent_name])
-        if not stop_success:
-            return False, f"Failed to stop agent {agent_name}"
+        Args:
+            index: The index of the agent to remove
             
+        Returns:
+            Tuple of (success, message)
+        """
+        agent_name = self._get_agent_name(index)
+        result_message = []
+        overall_success = True
+        
+        # First, delete the agent from Jenkins if it exists
+        if self.agent_configurator.agent_exists(agent_name):
+            jenkins_success, jenkins_message = self.agent_configurator.delete_agent(agent_name)
+            result_message.append(jenkins_message)
+            if not jenkins_success:
+                overall_success = False
+                console.print(f"[yellow]Warning: {jenkins_message}[/yellow]")
+        
+        # Stop container
+        stop_success, stop_message = self.docker.run_command(['docker', 'stop', agent_name])
+        if not stop_success:
+            overall_success = False
+            result_message.append(f"Failed to stop container: {stop_message}")
+            console.print(f"[yellow]Warning: Failed to stop container {agent_name}[/yellow]")
+        
         # Remove container
-        return self.docker.run_command(['docker', 'rm', agent_name])
+        rm_success, rm_message = self.docker.run_command(['docker', 'rm', agent_name])
+        if not rm_success:
+            overall_success = False
+            result_message.append(f"Failed to remove container: {rm_message}")
+            console.print(f"[yellow]Warning: Failed to remove container {agent_name}[/yellow]")
+        
+        return overall_success, "\n".join(result_message)
 
     def remove_all_agents(self) -> List[Tuple[bool, str]]:
-        """Remove all agent containers."""
+        """Remove all agents from both Docker and Jenkins.
+        
+        Returns:
+            List of tuples containing (success, message) for each agent
+        """
         agents = self.list_agents()
         results = []
+        
+        console.print(f"[bold blue]Removing {len(agents)} Jenkins agents...[/bold blue]")
+        
         for agent in agents:
-            success, message = self.docker.run_command(['docker', 'rm', '-f', agent['id']])
-            results.append((success, message))
+            agent_name = agent['name']
+            console.print(f"[yellow]Removing agent {agent_name}...[/yellow]")
+            
+            # First, delete the agent from Jenkins if it exists
+            jenkins_result = (True, "Agent not found in Jenkins")
+            if self.agent_configurator.agent_exists(agent_name):
+                jenkins_result = self.agent_configurator.delete_agent(agent_name)
+                if jenkins_result[0]:
+                    console.print(f"[green]✓ Agent {agent_name} deleted from Jenkins[/green]")
+                else:
+                    console.print(f"[yellow]Warning: {jenkins_result[1]}[/yellow]")
+            
+            # Remove container
+            docker_result = self.docker.run_command(['docker', 'rm', '-f', agent['id']])
+            if docker_result[0]:
+                console.print(f"[green]✓ Container {agent_name} removed[/green]")
+            else:
+                console.print(f"[yellow]Warning: Failed to remove container {agent_name}[/yellow]")
+            
+            # Combine results
+            combined_success = jenkins_result[0] and docker_result[0]
+            combined_message = f"Jenkins: {jenkins_result[1]}\nDocker: {docker_result[1]}"
+            results.append((combined_success, combined_message))
+        
+        # Print summary
+        success_count = len([r for r in results if r[0]])
+        console.print(f"\n[bold]Removal Summary:[/bold]")
+        console.print(f"Successfully removed: {success_count}/{len(agents)} agents")
+        
         return results

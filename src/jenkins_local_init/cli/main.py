@@ -425,29 +425,41 @@ def list():
 @agent.command()
 @click.argument('index', type=int)
 def remove(index: int):
-    """Remove a specific agent."""
+    """Remove a specific agent from both Docker and Jenkins."""
     try:
+        agent_name = f"jenkins-local-agent-{index}"
+        console.print(f"[bold blue]Removing agent {agent_name}...[/bold blue]")
+        
         success, message = agent_manager.remove_agent(index)
         
+        # The detailed output is already handled by the agent_manager.remove_agent method
+        # Just display the final status
         if success:
             console.print(f"[green]✓[/green] Successfully removed agent {index}")
         else:
-            console.print(f"[red]✗[/red] Failed to remove agent {index}: {message}")
+            console.print(f"[red]✗[/red] Failed to remove agent {index}")
+            console.print(f"Details: {message}")
             
     except Exception as e:
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
 
 @agent.command()
 def remove_all():
-    """Remove all Jenkins agents."""
+    """Remove all Jenkins agents from both Docker and Jenkins."""
     try:
+        # The detailed output is already handled by the agent_manager.remove_all_agents method
         results = agent_manager.remove_all_agents()
         
+        # Just display a final summary if needed
         success_count = sum(1 for success, _ in results if success)
-        if success_count == len(results):
-            console.print("[green]✓[/green] Successfully removed all agents")
+        if len(results) == 0:
+            console.print("[yellow]No agents found to remove[/yellow]")
+        elif success_count == len(results):
+            # The success message is already printed by remove_all_agents
+            pass
         else:
-            console.print(f"[yellow]![/yellow] Removed {success_count} out of {len(results)} agents")
+            # The partial success message is already printed by remove_all_agents
+            pass
             
     except Exception as e:
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
