@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+   <head resURL="/static/681590e0" data-rooturl="" data-resurl="/static/681590e0" data-extensions-available="true" data-unit-test="false" data-imagesurl="/static/681590e0/images" data-crumb-header="Jenkins-Crumb" data-crumb-value="3b866b7959af97c2be89ab51d9c194042a7c75eb19eedc5b73ef995d6e7a9a67">
+      <title>Jenkins</title>
+      <link rel="stylesheet" href="/static/681590e0/jsbundles/styles.css" type="text/css">
+      <link rel="stylesheet" href="/static/681590e0/css/responsive-grid.css" type="text/css">
+      <link rel="icon" href="/static/681590e0/favicon.svg" type="image/svg+xml">
+      <link sizes="any" rel="alternate icon" href="/static/681590e0/favicon.ico">
+      <link sizes="180x180" rel="apple-touch-icon" href="/static/681590e0/apple-touch-icon.png">
+      <link color="#191717" rel="mask-icon" href="/static/681590e0/mask-icon.svg">
+      <meta name="theme-color" content="#ffffff">
+      <script src="/static/681590e0/scripts/behavior.js" type="text/javascript"></script><script src='/adjuncts/681590e0/org/kohsuke/stapler/bind.js' type='text/javascript'></script><script src="/static/681590e0/scripts/hudson-behavior.js" type="text/javascript"></script><script src="/static/681590e0/scripts/sortable.js" type="text/javascript"></script>
+      <link rel="search" href="/opensearch.xml" type="application/opensearchdescription+xml" title="Jenkins">
+      <meta name="ROBOTS" content="INDEX,NOFOLLOW">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="/static/681590e0/jsbundles/vendors.js" type="text/javascript"></script><script src="/static/681590e0/jsbundles/sortable-drag-drop.js" type="text/javascript"></script><script defer="true" src="/static/681590e0/jsbundles/app.js" type="text/javascript"></script>
+   </head>
+   <body data-model-type="hudson.model.ComputerSet" id="jenkins" class=" one-column jenkins-2.492.1" data-version="2.492.1">
+      <div data-help="Help" data-no-results-for="No results for" id="command-palette-i18n" class="i18n" data-get-help="Get help using Jenkins search"></div>
+      <dialog id="command-palette" class="jenkins-command-palette__dialog">
+         <div class="jenkins-command-palette__wrapper">
+            <div class="jenkins-command-palette">
+               <div class="jenkins-search-container">
+                  <div class="jenkins-search  jenkins-command-palette__search">
+                     <div class="jenkins-search__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                           <title/>
+                           <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                           <path d="M338.29 338.29L448 448" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/>
+                        </svg>
+                     </div>
+                     <input autocorrect="off" autocomplete="off" spellcheck="false" id="command-bar" placeholder="Search" type="search" class="jenkins-search__input" autocapitalize="off">
+                  </div>
+               </div>
+               <div id="search-results-container" class="jenkins-command-palette__results-container">
+                  <div id="search-results" class="jenkins-command-palette__results"></div>
+               </div>
+            </div>
+         </div>
+      </dialog>
+      <a href="#skip2content" class="jenkins-skip-link">Skip to content</a>
+      <header id="page-header" class="page-header">
+         <div class="page-header__brand">
+            <div class="logo"><a id="jenkins-home-link" href="/"><img src="/static/681590e0/images/svgs/logo.svg" alt="[Jenkins]" id="jenkins-head-icon"><img src="/static/681590e0/images/title.svg" alt="Jenkins" width="139" id="jenkins-name-icon" height="34"></a></div>
+            <a href="/" class="page-header__brand-link"><img src="/static/681590e0/images/svgs/logo.svg" alt="[Jenkins]" class="page-header__brand-image"><span class="page-header__brand-name">Jenkins</span></a>
+         </div>
+         <div class="page-header__hyperlinks">
+            <button data-keyboard-shortcut="CMD+K" data-html-tooltip="&lt;div class=&quot;jenkins-keyboard-shortcut__tooltip&quot;&gt;&lt;span class=&quot;jenkins-!-margin-right-1&quot;&gt;Search&lt;/span&gt;&lt;div class=&quot;jenkins-keyboard-shortcut&quot;&gt;CTRL+K&lt;/div&gt;&lt;/div&gt;" id="button-open-command-palette" data-search-url="/search/suggest" data-search-help-url="https://www.jenkins.io/redirect/search-box">
+               <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                  <title/>
+                  <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
+                  <path d="M338.29 338.29L448 448" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/>
+               </svg>
+            </button>
+         </div>
+         <script src="/static/681590e0/jsbundles/keyboard-shortcuts.js" type="text/javascript"></script>
+         <div class="login page-header__hyperlinks">
+            <div id="visible-am-insertion" class="page-header__am-wrapper"></div>
+            <div id="visible-sec-am-insertion" class="page-header__am-wrapper"></div>
+            <a href="/user/admin" class="model-link">
+               <svg class="icon-md" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                  <title/>
+                  <path d="M258.9 48C141.92 46.42 46.42 141.92 48 258.9c1.56 112.19 92.91 203.54 205.1 205.1 117 1.6 212.48-93.9 210.88-210.88C462.44 140.91 371.09 49.56 258.9 48zm126.42 327.25a4 4 0 01-6.14-.32 124.27 124.27 0 00-32.35-29.59C321.37 329 289.11 320 256 320s-65.37 9-90.83 25.34a124.24 124.24 0 00-32.35 29.58 4 4 0 01-6.14.32A175.32 175.32 0 0180 259c-1.63-97.31 78.22-178.76 175.57-179S432 158.81 432 256a175.32 175.32 0 01-46.68 119.25z" fill="currentColor"/>
+                  <path d="M256 144c-19.72 0-37.55 7.39-50.22 20.82s-19 32-17.57 51.93C191.11 256 221.52 288 256 288s64.83-32 67.79-71.24c1.48-19.74-4.8-38.14-17.68-51.82C293.39 151.44 275.59 144 256 144z" fill="currentColor"/>
+               </svg>
+               <span class="hidden-xs hidden-sm">admin</span>
+            </a>
+            <a href="/logout">
+               <svg class="icon-md" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                  <title/>
+                  <path d="M304 336v40a40 40 0 01-40 40H104a40 40 0 01-40-40V136a40 40 0 0140-40h152c22.09 0 48 17.91 48 40v40M368 336l80-80-80-80M176 256h256" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+               </svg>
+               <span class="hidden-xs hidden-sm">log out</span>
+            </a>
+         </div>
+      </header>
+      <div id="breadcrumbBar" class="jenkins-breadcrumbs" aria-label="breadcrumb">
+         <ol class="jenkins-breadcrumbs__list" id="breadcrumbs">
+            <li class="jenkins-breadcrumbs__list-item"><a href="/" class="model-link">Dashboard</a></li>
+            <li class="children" data-href="/"></li>
+            <li class="jenkins-breadcrumbs__list-item"><a href="/computer/" class="">Nodes</a></li>
+            <li class="children" data-href="/computer/"></li>
+         </ol>
+      </div>
+      <div id="page-body" class="app-page-body app-page-body--one-column clear">
+         <div id="main-panel">
+            <a id="skip2content"></a><!--
+               start of main content ⇒
+               -->
+            <form method="post" autocomplete="off" name="config" action="doCreateItem" class="jenkins-form">
+               <div width="100%">
+                  <div class="jenkins-form-item tr ">
+                     <div class="jenkins-form-label help-sibling">Name<a tooltip="Help for feature: Name" helpURL="/descriptor/hudson.slaves.DumbSlave/help/name" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                     <div class="setting-main">
+                        <input checkMessage="Name is mandatory" name="name" placeholder="" type="text" class="jenkins-input   required" value="jenkins-agent-1">
+                     </div>
+                     <div class="validation-error-area"></div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-section">
+                     <div class="jenkins-form-item tr ">
+                        <div class="jenkins-form-label help-sibling">Description<a tooltip="Help for feature: Description" helpURL="/help/system-config/master-slave/description.html" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                        <div class="setting-main">
+                           <link rel='stylesheet' href='/adjuncts/681590e0/lib/form/textarea/textarea.css' type='text/css' />
+                           <script src='/adjuncts/681590e0/lib/form/textarea/textarea.js' type='text/javascript'></script>
+                           <textarea name="nodeDescription" rows="5" class="jenkins-input   "></textarea>
+                           <div class="textarea-preview-container">Plain text<a previewEndpoint="/markupFormatter/previewDescription" href="#" class="textarea-show-preview">Preview</a><a href="#" class="textarea-hide-preview">Hide preview</a></div>
+                           <div class="textarea-preview"></div>
+                        </div>
+                        <div class="validation-error-area"></div>
+                        <div class="help-area tr">
+                           <div class="help">
+                              <p class="jenkins-spinner">Loading...
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item tr ">
+                     <div class="jenkins-form-label help-sibling">Number of executors<a tooltip="Help for feature: Number of executors" helpURL="/descriptor/hudson.slaves.DumbSlave/help/numExecutors" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                     <div class="setting-main"><input checkDependsOn="" default="1" min="1" step="1" checkUrl="/descriptorByName/hudson.slaves.DumbSlave/checkNumExecutors" name="_.numExecutors" type="number" class="jenkins-input validated positive-number-required" value="1"></div>
+                     <div class="validation-error-area"></div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item tr ">
+                     <div class="jenkins-form-label help-sibling">Remote root directory<a tooltip="Help for feature: Remote root directory" helpURL="/descriptor/hudson.slaves.DumbSlave/help/remoteFS" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                     <div class="setting-main">
+                        <input checkDependsOn="" checkUrl="/descriptorByName/hudson.slaves.DumbSlave/checkRemoteFS" name="_.remoteFS" placeholder="" type="text" class="jenkins-input validated  " value="">
+                     </div>
+                     <div class="validation-error-area"></div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item tr ">
+                     <div class="jenkins-form-label help-sibling">Labels<a tooltip="Help for feature: Labels" helpURL="/descriptor/hudson.slaves.DumbSlave/help/labelString" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                     <div class="setting-main">
+                        <input name="_.labelString" placeholder="" type="text" class="jenkins-input   " value="">
+                     </div>
+                     <div class="validation-error-area"></div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item tr ">
+                     <div class="jenkins-form-label help-sibling">Usage<a tooltip="Help for feature: Usage" helpURL="/help/system-config/master-slave/usage.html" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                     <div class="setting-main">
+                        <div class="jenkins-select">
+                           <select name="mode" class="jenkins-select__input">
+                              <option value="NORMAL">Use this node as much as possible</option>
+                              <option value="EXCLUSIVE">Only build jobs with label expressions matching this node</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="validation-error-area"></div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item">
+                     <div class="jenkins-form-label help-sibling">
+                        Launch method
+                        <a tooltip="Help for feature: Launch method" helpURL="/descriptor/hudson.slaves.DumbSlave/help/launcher" href="#" class="jenkins-help-button"><span>?</span></a>
+                     </div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                     <div class="jenkins-select">
+                        <select class="jenkins-select__input dropdownList">
+                           <option value="hudson.slaves.JNLPLauncher">Launch agent by connecting it to the controller</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="dropdownList-container tr">
+                     <div>
+                        <div width="100%" name="slave.launcher">
+                           <div class="dropdownList-start rowvg-start tr"></div>
+                           <div style="display:none" class="tr">
+                              <div><input name="stapler-class" type="hidden" value="hudson.slaves.JNLPLauncher"><input name="$class" type="hidden" value="hudson.slaves.JNLPLauncher"></div>
+                           </div>
+                           <div class="dropdownList-end rowvg-end tr"></div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="jenkins-form-item">
+                     <div class="jenkins-form-label help-sibling">
+                        Availability
+                        <a tooltip="Help for feature: Availability" helpURL="/descriptor/hudson.slaves.DumbSlave/help/retentionStrategy" href="#" class="jenkins-help-button"><span>?</span></a>
+                     </div>
+                     <div class="help-area tr">
+                        <div class="help">
+                           <p class="jenkins-spinner">Loading...
+                        </div>
+                     </div>
+                     <div class="jenkins-select">
+                        <select class="jenkins-select__input dropdownList">
+                           <option value="0">Keep this agent online as much as possible</option>
+                           <option value="1">Bring this agent online according to a schedule</option>
+                           <option value="2">Bring this agent online when in demand, and take offline when idle</option>
+                        </select>
+                     </div>
+                  </div>
+                  <div class="dropdownList-container tr">
+                     <div>
+                        <div width="100%" name="retentionStrategy">
+                           <div class="dropdownList-start rowvg-start tr"></div>
+                           <div class="render-on-demand " data-proxy-method="makeStaplerProxy" data-proxy-url="/$stapler/bound/5b2ea13b-0484-4530-acb1-b0cc7a9acf8a" data-proxy-crumb="3b866b7959af97c2be89ab51d9c194042a7c75eb19eedc5b73ef995d6e7a9a67" data-proxy-url-names="render"></div>
+                           <div style="display:none" class="tr">
+                              <div><input name="stapler-class" type="hidden" value="hudson.slaves.RetentionStrategy$Always"><input name="$class" type="hidden" value="hudson.slaves.RetentionStrategy$Always"></div>
+                           </div>
+                           <div class="dropdownList-end rowvg-end tr"></div>
+                           <div class="dropdownList-start rowvg-start tr"></div>
+                           <div class="render-on-demand " data-proxy-method="makeStaplerProxy" data-proxy-url="/$stapler/bound/f56af96f-4268-4c81-88b3-d43073c3e2f8" data-proxy-crumb="3b866b7959af97c2be89ab51d9c194042a7c75eb19eedc5b73ef995d6e7a9a67" data-proxy-url-names="render"></div>
+                           <div style="display:none" class="tr">
+                              <div><input name="stapler-class" type="hidden" value="hudson.slaves.SimpleScheduledRetentionStrategy"><input name="$class" type="hidden" value="hudson.slaves.SimpleScheduledRetentionStrategy"></div>
+                           </div>
+                           <div class="dropdownList-end rowvg-end tr"></div>
+                           <div class="dropdownList-start rowvg-start tr"></div>
+                           <div class="render-on-demand " data-proxy-method="makeStaplerProxy" data-proxy-url="/$stapler/bound/18aeb6a9-9020-4329-933b-77d8c89bb046" data-proxy-crumb="3b866b7959af97c2be89ab51d9c194042a7c75eb19eedc5b73ef995d6e7a9a67" data-proxy-url-names="render"></div>
+                           <div style="display:none" class="tr">
+                              <div><input name="stapler-class" type="hidden" value="hudson.slaves.RetentionStrategy$Demand"><input name="$class" type="hidden" value="hudson.slaves.RetentionStrategy$Demand"></div>
+                           </div>
+                           <div class="dropdownList-end rowvg-end tr"></div>
+                        </div>
+                     </div>
+                  </div>
+                  <div name="nodeProperties" style="display:none" class="row-set-start row-group-start tr"></div>
+                  <section class="jenkins-section">
+                     <div class="jenkins-section__title">
+                        <div class="jenkins-hidden">
+                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" height="512px" version="1.1" viewBox="0 0 512 512" width="512px">
+                              <g fill="none" fill-rule="evenodd" stroke="none" stroke-width="1">
+                                 <g stroke="currentColor" stroke-width="32" transform="translate(50.378500, 42.000000)">
+                                    <path d="M211.9115,150.31 C185.005783,147.652748 159.332619,162.189611 147.769706,186.628874 C136.206793,211.068138 141.24875,240.137201 160.366525,259.254975 C179.484299,278.37275 208.553362,283.414707 232.992626,271.851794 C257.431889,260.288881 271.968752,234.615717 269.3115,207.71 C266.263249,177.360931 242.260569,153.358251 211.9115,150.31 L211.9115,150.31 Z M410.9165,277.125 C411.707607,281.564887 410.903766,286.141508 408.647035,290.04607 L372.853966,351.97469 C370.607176,355.862053 367.040281,358.81433 362.8015,360.295 C358.482479,361.803699 353.868429,362.272089 349.334332,361.662103 L320.522752,357.785994 C299.879684,355.00882 279.988607,366.61094 272.243485,385.946453 L261.688643,412.296365 C259.969284,416.588704 257.239668,420.402837 253.7315,423.415 C250.285888,426.373452 245.894629,428 241.353189,428 L169.796876,428 C165.308275,428 160.960823,426.431216 157.5065,423.565 C153.996701,420.652754 151.25415,416.924675 149.518855,412.70702 L138.358864,385.582532 C130.453683,366.368896 110.519057,354.968685 89.9503733,357.89869 L61.8696222,361.898788 C57.3434346,362.543543 52.7286498,362.09476 48.4115003,360.59 C44.1729946,359.112652 40.6059709,356.162306 38.3598585,352.276117 L2.56596537,290.34607 C0.309233973,286.441508 -0.494606827,281.864887 0.296500273,277.425 C1.10103427,272.909758 2.99390287,268.65863 5.81124857,265.039618 L23.4896432,242.330895 C36.4067894,225.738218 36.3997393,202.490855 23.4725314,185.906016 L5.73914207,163.155131 C2.93726987,159.560495 1.06449867,155.330725 0.286500273,150.84 C-0.479118527,146.420732 0.330889273,141.87293 2.57525137,137.989769 L38.3890342,76.0253095 C40.6358245,72.1379474 44.2027191,69.1856702 48.4415003,67.705 C52.7614677,66.1959703 57.3747149,65.7192136 61.9119868,66.3128907 L91.2373143,70.1499486 C111.792442,72.839474 131.546967,61.2195013 139.18365,41.9470371 L149.578712,15.7133384 C151.281675,11.4156234 154.004147,7.5964633 157.5115,4.585 C160.957112,1.6265481 165.348371,0 169.889811,0 L241.446124,0 C245.934725,0 250.282177,1.5687841 253.7365,4.435 C257.245602,7.3466683 259.982278,11.0789954 261.704008,15.3012287 L272.612929,42.053395 C280.490247,61.3711009 300.470109,72.8820729 321.133157,70.007291 L349.370217,66.0787615 C353.899388,65.4486329 358.513486,65.904939 362.8315,67.41 C367.070006,68.8873483 370.637029,71.837694 372.883142,75.7238833 L408.677035,137.65393 C410.933766,141.558492 411.737607,146.135113 410.9465,150.575 C410.140427,155.098876 408.314604,159.379748 405.607548,163.092841 L385.561411,190.588825 C373.755974,206.781577 374.583692,228.954539 387.563545,244.222054 L405.168289,264.929585 C408.130553,268.41394 410.114244,272.622543 410.9165,277.125 Z"/>
+                                 </g>
+                              </g>
+                           </svg>
+                        </div>
+                        Node Properties
+                     </div>
+                     <div class="stapler-class-bag tr">
+                        <div><input type="hidden" name="stapler-class-bag" value="true"></div>
+                     </div>
+                     <div class="optionalBlock-container jenkins-form-item">
+                        <div class="help-sibling tr optional-block-start row-group-start row-set-start" hasHelp="false">
+                           <div class="jenkins-checkbox-help-wrapper"><span class="jenkins-checkbox"><input name="hudson-node_monitors-DiskSpaceMonitorNodeProperty" type="checkbox" class="optional-block-control block-control optional-block-event-item  "><label class="attach-previous ">Disk Space Monitoring Thresholds</label></span></div>
+                        </div>
+                        <div class="rowvg-start tr"></div>
+                        <div class="form-container tr">
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">Free Disk Space Threshold<a tooltip="Help for feature: Free Disk Space Threshold" helpURL="/descriptor/hudson.node_monitors.DiskSpaceMonitorNodeProperty/help/freeDiskSpaceThreshold" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <input default="1GiB" name="_.freeDiskSpaceThreshold" placeholder="" type="text" class="jenkins-input   " value="1GiB">
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">Free Disk Space Warning Threshold<a tooltip="Help for feature: Free Disk Space Warning Threshold" helpURL="/descriptor/hudson.node_monitors.DiskSpaceMonitorNodeProperty/help/freeDiskSpaceWarningThreshold" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <input default="2GiB" name="_.freeDiskSpaceWarningThreshold" placeholder="" type="text" class="jenkins-input   " value="2GiB">
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">Free Temp Space Threshold<a tooltip="Help for feature: Free Temp Space Threshold" helpURL="/descriptor/hudson.node_monitors.DiskSpaceMonitorNodeProperty/help/freeTempSpaceThreshold" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <input default="1GiB" name="_.freeTempSpaceThreshold" placeholder="" type="text" class="jenkins-input   " value="1GiB">
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">Free Temp Space Warning Threshold<a tooltip="Help for feature: Free Temp Space Warning Threshold" helpURL="/descriptor/hudson.node_monitors.DiskSpaceMonitorNodeProperty/help/freeTempSpaceWarningThreshold" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <input default="2GiB" name="_.freeTempSpaceWarningThreshold" placeholder="" type="text" class="jenkins-input   " value="2GiB">
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="tr row-set-end rowvg-end optional-block-end row-group-end"></div>
+                     </div>
+                     <div class="optionalBlock-container jenkins-form-item">
+                        <div class="help-sibling tr optional-block-start row-group-start row-set-start" hasHelp="false">
+                           <div class="jenkins-checkbox-help-wrapper"><span class="jenkins-checkbox"><input name="hudson-slaves-EnvironmentVariablesNodeProperty" type="checkbox" class="optional-block-control block-control optional-block-event-item  "><label class="attach-previous ">Environment variables</label></span></div>
+                        </div>
+                        <div class="rowvg-start tr"></div>
+                        <div class="form-container tr">
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">List of variables<a tooltip="Help for feature: List of variables" helpURL="/help/system-config/nodeEnvironmentVariables.html" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <script src='/adjuncts/681590e0/lib/form/repeatable/repeatable.js' type='text/javascript'></script>
+                                 <div class="repeated-container">
+                                    <div name="env" class="repeated-chunk to-be-removed">
+                                       <div class="repeated-chunk__header"></div>
+                                       <table width="100%">
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling">Name</div>
+                                             <div class="setting-main">
+                                                <input name="env.key" placeholder="" type="text" class="jenkins-input   " value="">
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling">Value</div>
+                                             <div class="setting-main">
+                                                <input name="env.value" placeholder="" type="text" class="jenkins-input   " value="">
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling"></div>
+                                             <div class="setting-main">
+                                                <div align="right">
+                                                   <button tooltip="Delete" type="button" class="repeatable-delete danger">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                                                         <path d="M368 368L144 144M368 144L144 368" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                      </svg>
+                                                   </button>
+                                                </div>
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                       </table>
+                                    </div>
+                                    <div class="repeatable-insertion-point"></div>
+                                    <button type="button" class="jenkins-button repeatable-add">Add</button>
+                                 </div>
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="tr row-set-end rowvg-end optional-block-end row-group-end"></div>
+                     </div>
+                     <div class="optionalBlock-container jenkins-form-item">
+                        <div class="help-sibling tr optional-block-start row-group-start row-set-start" hasHelp="false">
+                           <div class="jenkins-checkbox-help-wrapper"><span class="jenkins-checkbox"><input name="hudson-tools-ToolLocationNodeProperty" type="checkbox" class="optional-block-control block-control optional-block-event-item  "><label class="attach-previous ">Tool Locations</label></span></div>
+                        </div>
+                        <div class="rowvg-start tr"></div>
+                        <div class="form-container tr">
+                           <div class="jenkins-form-item tr ">
+                              <div class="jenkins-form-label help-sibling">List of tool locations<a tooltip="Help for feature: List of tool locations" helpURL="/help/tools/tool-location-node-property.html" href="#" class="jenkins-help-button"><span>?</span></a></div>
+                              <div class="setting-main">
+                                 <div class="repeated-container">
+                                    <div name="locations" class="repeated-chunk to-be-removed">
+                                       <div class="repeated-chunk__header"></div>
+                                       <table width="100%">
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling">Name</div>
+                                             <div class="setting-main">
+                                                <div class="jenkins-select"><select class="jenkins-select__input" name="locations.key"></select></div>
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling">Home</div>
+                                             <div class="setting-main">
+                                                <input name="locations.home" placeholder="" type="text" class="jenkins-input   " value="">
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                          <div class="jenkins-form-item tr ">
+                                             <div class="jenkins-form-label help-sibling"></div>
+                                             <div class="setting-main">
+                                                <div align="right">
+                                                   <button tooltip="Delete" type="button" class="repeatable-delete danger">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                                                         <path d="M368 368L144 144M368 144L144 368" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                                                      </svg>
+                                                   </button>
+                                                </div>
+                                             </div>
+                                             <div class="validation-error-area"></div>
+                                          </div>
+                                       </table>
+                                    </div>
+                                    <div class="repeatable-insertion-point"></div>
+                                    <button type="button" class="jenkins-button repeatable-add">Add</button>
+                                 </div>
+                              </div>
+                              <div class="validation-error-area"></div>
+                              <div class="help-area tr">
+                                 <div class="help">
+                                    <p class="jenkins-spinner">Loading...
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="tr row-set-end rowvg-end optional-block-end row-group-end"></div>
+                     </div>
+                  </section>
+                  <div class="row-set-end row-group-end tr jenkins-!-display-contents"></div>
+                  <div id="bottom-sticker">
+                     <div class="bottom-sticker-inner jenkins-buttons-row jenkins-buttons-row--equal-width"><input name="type" type="hidden" value="hudson.slaves.DumbSlave"><button formNoValidate="formNoValidate" name="Submit" class="jenkins-button jenkins-submit-button jenkins-button--primary ">
+                        Save
+                        </button>
+                     </div>
+                  </div>
+               </div>
+            </form>
+            <script src='/adjuncts/681590e0/lib/form/confirm.js' type='text/javascript'></script><!--
+               ⇐ end of main content
+               -->
+         </div>
+      </div>
+      <footer class="page-footer jenkins-mobile-hide">
+         <div class="page-footer__flex-row">
+            <div class="page-footer__footer-id-placeholder" id="footer"></div>
+            <link rel='stylesheet' href='/adjuncts/681590e0/jenkins/management/AdministrativeMonitorsDecorator/resources.css' type='text/css' />
+            <script src='/adjuncts/681590e0/jenkins/management/AdministrativeMonitorsDecorator/resources.js' type='text/javascript'></script>
+            <div id="visible-am-container" class="am-container">
+               <a id="visible-am-button" href="#" title="There are 2 active administrative monitors." class="am-button" data-href="/administrativeMonitorsApi/nonSecurityPopupContent">
+                  <svg class="icon-md" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                     <title/>
+                     <path d="M427.68 351.43C402 320 383.87 304 383.87 217.35 383.87 138 343.35 109.73 310 96c-4.43-1.82-8.6-6-9.95-10.55C294.2 65.54 277.8 48 256 48s-38.21 17.55-44 37.47c-1.35 4.6-5.52 8.71-9.95 10.53-33.39 13.75-73.87 41.92-73.87 121.35C128.13 304 110 320 84.32 351.43 73.68 364.45 83 384 101.61 384h308.88c18.51 0 27.77-19.61 17.19-32.57zM320 384v16a64 64 0 01-128 0v-16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                  </svg>
+                  <div class="am-monitor__indicator-mobile"></div>
+                  <span class="am-monitor__count">2</span>
+               </a>
+               <div id="visible-am-list" class="am-list"></div>
+            </div>
+            <div id="visible-sec-am-container" class="am-container">
+               <a id="visible-sec-am-button" href="#" title="There are 2 active security administrative monitors." class="am-button security-am" data-href="/administrativeMonitorsApi/securityPopupContent">
+                  <svg class="icon-md" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 512 512">
+                     <title/>
+                     <path d="M250.26 155.39l5.74 122 5.73-121.95a5.74 5.74 0 00-5.79-6h0a5.74 5.74 0 00-5.68 5.95z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                     <path d="M256 380.25a20 20 0 1120-20 20 20 0 01-20 20z" fill="currentColor"/>
+                     <path d="M463.1 112.37C373.68 96.33 336.71 84.45 256 48c-80.71 36.45-117.68 48.33-207.1 64.37C32.7 369.13 240.58 457.79 256 464c15.42-6.21 223.3-94.87 207.1-351.63z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
+                  </svg>
+                  <div class="am-monitor__indicator-mobile"></div>
+                  <span class="am-monitor__count">2</span>
+               </a>
+               <div id="visible-sec-am-list" class="am-list"></div>
+            </div>
+            <div class="page-footer__links">
+               <a class="jenkins-button jenkins-button--tertiary rest-api" href="api/">REST API</a><button type="button" class="jenkins-button jenkins-button--tertiary jenkins_ver" data-dropdown="true">
+               Jenkins 2.492.1
+               </button>
+               <template>
+                  <div class="jenkins-dropdown">
+                     <template data-dropdown-icon="&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot; />
+                     <template data-dropdown-type="SEPARATOR"></template>
+                     <template data-dropdown-icon="&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 512 512&quot;&gt;&lt;path d=&quot;M352.92 80C288 80 256 144 256 144s-32-64-96.92-64c-52.76 0-94.54 44.14-95.08 96.81-1.1 109.33 86.73 187.08 183 252.42a16 16 0 0018 0c96.26-65.34 184.09-143.09 183-252.42-.54-52.67-42.32-96.81-95.08-96.81z&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;32&quot;/&gt;&lt;/svg&gt;" data-dropdown-text="Get involved" data-dropdown-type="ITEM" data-dropdown-href="https://www.jenkins.io/participate/"></template>
+                     <template data-dropdown-icon="&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; aria-hidden=&quot;true&quot; viewBox=&quot;0 0 512 512&quot;&gt;&lt;path d=&quot;M384 224v184a40 40 0 01-40 40H104a40 40 0 01-40-40V168a40 40 0 0140-40h167.48M336 64h112v112M224 288L440 72&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;32&quot;/&gt;&lt;/svg&gt;" data-dropdown-text="Website" data-dropdown-type="ITEM" data-dropdown-href="https://www.jenkins.io/"></template>
+                  </div>
+               </template>
+            </div>
+         </div>
+      </footer>
+   </body>
+</html>
+%                                         
+(venv) (base) sid@Siddarthas-MacBook-Air jenkins-local-init %

@@ -4,6 +4,10 @@ from typing import Tuple, Optional
 import subprocess
 from ..core.docker import DockerManager
 from ..config.manager import ConfigManager
+import requests
+import time
+import json
+from typing import Tuple, Optional, Dict
 
 class JenkinsMaster:
     def __init__(self, docker_manager: DockerManager, config_manager: ConfigManager):
@@ -17,6 +21,7 @@ class JenkinsMaster:
         self.image = self.master_config["image"]
         self.host_port = self.master_config["port"]
         self.jnlp_port = self.master_config["jnlp_port"]
+        self.jenkins_url = f"http://localhost:{self.host_port}"
 
     def is_running(self) -> bool:
         """Check if Jenkins master container is running."""
@@ -41,6 +46,8 @@ class JenkinsMaster:
             '-p', f'{self.host_port}:8080',
             '-p', f'{self.jnlp_port}:50000',
             '--restart', 'unless-stopped',
+            '-e', 'JAVA_OPTS=-Djenkins.install.runSetupWizard=false',
+            '-e', 'JENKINS_OPTS=--argumentsRealm.roles.user=admin --argumentsRealm.passwd.admin=admin --argumentsRealm.roles.admin=admin',
             self.image
         ]
         
@@ -71,6 +78,16 @@ class JenkinsMaster:
     def start(self) -> Tuple[bool, str]:
         """Start Jenkins master container."""
         return self.docker.run_command(['docker', 'start', self.container_name])
+    
+    def restart(self) -> Tuple[bool, str]:
+        """Restart Jenkins master container."""
+        stop_success, _ = self.stop()
+        if not stop_success:
+            return False, "Failed to stop container"
+        start_success, _ = self.start()
+        if not start_success:
+            return False, "Failed to start container"
+        return True, "Container restarted successfully"
 
     def remove(self) -> Tuple[bool, str]:
         """Remove Jenkins master container."""
@@ -80,3 +97,79 @@ class JenkinsMaster:
     def get_logs(self) -> Tuple[bool, str]:
         """Get container logs."""
         return self.docker.run_command(['docker', 'logs', self.container_name])
+
+    def wait_for_jenkins_ready(self, timeout: int = 180) -> bool:
+        """Wait for Jenkins to be fully up and running."""
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                response = requests.get(f"{self.jenkins_url}/login")
+                if response.status_code == 200:
+                    return True
+            except:
+                pass
+            time.sleep(5)
+        return False
+    
+    def configure_initial_setup(self, admin_user: str, admin_password: str) -> Tuple[bool, str]:
+        """Configure initial Jenkins setup."""
+        if not self.wait_for_jenkins_ready():
+            return False, "Jenkins did not start within timeout period"
+
+        # initial_password = self.get_admin_password()
+        # if not initial_password:
+        #     return False, "Could not retrieve initial admin password"
+
+        # Create Jenkins home directory
+        success, _ = self.docker.run_command([
+            'docker', 'exec',
+            self.container_name,
+            'mkdir', '-p', '/var/jenkins_home/init.groovy.d'
+        ])
+        if not success:
+            return False, "Failed to create init.groovy.d directory"
+
+        # Create initialization script
+        init_script = f"""
+import jenkins.model.*
+import hudson.security.*
+import jenkins.security.s2m.AdminWhitelistRule
+
+def instance = Jenkins.getInstance()
+
+// Create first admin user
+def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+hudsonRealm.createAccount("{admin_user}", "{admin_password}")
+instance.setSecurityRealm(hudsonRealm)
+
+// Configure authorization
+def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+strategy.setAllowAnonymousRead(false)
+instance.setAuthorizationStrategy(strategy)
+
+// Enable agent to master security
+instance.getInjector().getInstance(AdminWhitelistRule.class).setMasterKillSwitch(false)
+
+// Disable setup wizard
+instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
+
+instance.save()
+"""
+        
+        # Write initialization script to container
+        with open('/tmp/init.groovy', 'w') as f:
+            f.write(init_script)
+        
+        success, _ = self.docker.run_command([
+            'docker', 'cp',
+            '/tmp/init.groovy',
+            f'{self.container_name}:/var/jenkins_home/init.groovy.d/init.groovy'
+        ])
+        if not success:
+            return False, "Failed to copy initialization script"
+
+        # Restart Jenkins to apply changes
+        self.restart()
+        
+        return True, "Initial setup completed successfully"
+

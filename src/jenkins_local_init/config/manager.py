@@ -7,8 +7,13 @@ from .defaults import DEFAULT_CONFIG, JENKINS_LOCAL_DIR
 class ConfigManager:
     def __init__(self):
         self.config_file = JENKINS_LOCAL_DIR / "config" / "config.yaml"
+        self.config_file = JENKINS_LOCAL_DIR / "config" / "config.yaml"
         self.config = DEFAULT_CONFIG
-        if self.config_file.exists():
+        # Create initial config file if it doesn't exist
+        if not self.config_file.exists():
+            self.init_directories()
+            self.save_config()
+        else:
             self.load_config()
             
 
