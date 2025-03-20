@@ -173,3 +173,70 @@ instance.save()
         
         return True, "Initial setup completed successfully"
 
+    def install_plugins(self, admin_user: str, admin_password: str, plugins: list) -> Tuple[bool, str]:
+        """Install Jenkins plugins."""
+        if not self.wait_for_jenkins_ready():
+            return False, "Jenkins did not start within timeout period"
+
+        # Create a session with authentication
+        session = requests.Session()
+        session.auth = (admin_user, admin_password)
+
+        # Get CSRF token (crumb)
+        try:
+            crumb_response = session.get(f"{self.jenkins_url}/crumbIssuer/api/json")
+            if crumb_response.status_code != 200:
+                return False, f"Failed to get CSRF token: {crumb_response.status_code}"
+            
+            crumb_data = crumb_response.json()
+            crumb_header = {crumb_data['crumbRequestField']: crumb_data['crumb']}
+        except Exception as e:
+            return False, f"Failed to get CSRF token: {str(e)}"
+
+        # Install each plugin
+        installed_plugins = []
+        failed_plugins = []
+
+        for plugin in plugins:
+            try:
+                # Check if plugin is already installed
+                plugin_info_url = f"{self.jenkins_url}/pluginManager/api/json?depth=1"
+                plugin_info_response = session.get(plugin_info_url)
+                if plugin_info_response.status_code == 200:
+                    plugin_data = plugin_info_response.json()
+                    installed = any(p['shortName'] == plugin for p in plugin_data.get('plugins', []))
+                    
+                    if installed:
+                        installed_plugins.append(plugin)
+                        continue
+
+                # Install plugin
+                install_url = f"{self.jenkins_url}/pluginManager/installNecessaryPlugins"
+                xml_data = f'<jenkins><install plugin="{plugin}@latest" /></jenkins>'
+                headers = {'Content-Type': 'text/xml'}
+                headers.update(crumb_header)
+                
+                response = session.post(install_url, data=xml_data, headers=headers)
+                
+                if response.status_code in (200, 302):
+                    installed_plugins.append(plugin)
+                else:
+                    failed_plugins.append(f"{plugin} (HTTP {response.status_code})")
+            except Exception as e:
+                failed_plugins.append(f"{plugin} (Error: {str(e)})")
+
+        # Wait for plugins to be installed
+        time.sleep(10)
+        
+        # Restart Jenkins to apply plugin changes
+        self.restart()
+        
+        # Wait for Jenkins to come back up
+        if not self.wait_for_jenkins_ready():
+            return False, "Jenkins did not restart properly after plugin installation"
+        
+        if failed_plugins:
+            return False, f"Failed to install plugins: {', '.join(failed_plugins)}"
+        
+        return True, f"Successfully installed plugins: {', '.join(installed_plugins)}"
+

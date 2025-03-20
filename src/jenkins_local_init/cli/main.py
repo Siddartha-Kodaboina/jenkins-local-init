@@ -212,10 +212,25 @@ def volume(action):
     help="Number of CPUs for agents",
     type=int
 )
-def setup(agents: int, memory: str, cpus: int):
-    """Set up Jenkins infrastructure with specified configuration."""
+@click.option(
+    "--admin-user",
+    default="admin",
+    help="Jenkins admin username",
+    type=str
+)
+@click.option(
+    "--admin-password",
+    default="admin",
+    help="Jenkins admin password",
+    type=str
+)
+def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: str):
+    """Set up complete Jenkins infrastructure with specified configuration."""
     try:
-        # Initialize configuration
+        console.print("[bold blue]Starting complete Jenkins infrastructure setup...[/bold blue]")
+        
+        # Step 1: Initialize configuration
+        console.print("\n[bold]Step 1/6: Initializing configuration...[/bold]")
         config_manager.init_directories()
         
         # Update configuration with CLI parameters
@@ -227,12 +242,122 @@ def setup(agents: int, memory: str, cpus: int):
             }
         })
         
-        console.print("[bold green]Configuration initialized[/bold green]")
+        console.print("[green]✓[/green] Configuration initialized")
         console.print(f"Config directory: {config_manager.config['directories']['config']}")
-        console.print("\n[bold blue]Infrastructure Configuration:[/bold blue]")
+        console.print("\n[bold]Infrastructure Configuration:[/bold]")
         console.print(f"Agents: {agents}")
         console.print(f"Memory: {memory}")
         console.print(f"CPUs: {cpus}")
+        
+        # Step 2: Initialize Docker resources
+        console.print("\n[bold]Step 2/6: Setting up Docker resources...[/bold]")
+        
+        # Check Docker daemon
+        if not docker_manager.check_docker_running():
+            console.print("[bold red]Error: Docker daemon is not running[/bold red]")
+            return
+            
+        # Create network
+        success, message = docker_manager.create_network("jenkins-local-net")
+        if success:
+            console.print("[green]✓[/green] Network setup successful")
+        else:
+            console.print(f"[yellow]![/yellow] Network setup note: {message}")
+
+        # Create volume
+        success, message = docker_manager.create_volume("jenkins-local-data")
+        if success:
+            console.print("[green]✓[/green] Volume setup successful")
+        else:
+            console.print(f"[yellow]![/yellow] Volume setup note: {message}")
+            
+        # Step 3: Generate SSH keys
+        console.print("\n[bold]Step 3/6: Setting up SSH keys...[/bold]")
+        
+        if ssh_manager.keys_exist():
+            console.print("[green]✓[/green] SSH keys already exist")
+        else:
+            success, message = ssh_manager.generate_key_pair()
+            if success:
+                console.print("[green]✓[/green] SSH key pair generated successfully")
+            else:
+                console.print(f"[red]✗[/red] Failed to generate SSH keys: {message}")
+                return
+                
+        # Step 4: Deploy Jenkins master
+        console.print("\n[bold]Step 4/6: Deploying Jenkins master...[/bold]")
+        
+        # Deploy master
+        success, message = jenkins_master.deploy()
+        
+        if not success:
+            console.print(f"[red]✗[/red] Failed to deploy Jenkins master: {message}")
+            return
+            
+        console.print("[green]✓[/green] Jenkins master deployed successfully")
+        
+        # Configure initial setup
+        console.print("Configuring initial setup...")
+        success, message = jenkins_master.configure_initial_setup(admin_user, admin_password)
+        
+        if not success:
+            console.print(f"[red]✗[/red] Initial setup failed: {message}")
+            return
+            
+        console.print("[green]✓[/green] Initial setup completed")
+        
+        # Step 5: Install required plugins
+        console.print("\n[bold]Step 5/6: Installing required plugins...[/bold]")
+        
+        required_plugins = [
+            "credentials",
+            "credentials-binding",
+            "ssh-credentials",
+            "ssh-slaves",
+            "ssh-agent",
+            "ssh"
+        ]
+        
+        success, message = jenkins_master.install_plugins(admin_user, admin_password, required_plugins)
+        
+        if success:
+            console.print(f"[green]✓[/green] {message}")
+        else:
+            console.print(f"[red]✗[/red] {message}")
+            console.print("[yellow]![/yellow] Continuing with setup despite plugin installation issues")
+            
+        # Step 6: Deploy Jenkins agents
+        console.print("\n[bold]Step 6/6: Deploying Jenkins agents...[/bold]")
+        
+        agent_manager.agent_configurator = JenkinsAgentConfigurator(
+            agent_manager.jenkins_url,
+            admin_user,
+            admin_password
+        )
+        
+        results = agent_manager.deploy_agents(agents, str(cpus), memory)
+        
+        success_count = len([r for r in results if not r.get('error')])
+        if success_count == agents:
+            console.print(f"[green]✓[/green] Successfully deployed {agents} agent(s)")
+        else:
+            console.print(f"[yellow]![/yellow] Deployed {success_count} out of {agents} agent(s)")
+            
+        for i, result in enumerate(results, 1):
+            status = "[green]✓[/green]" if not result.get('error') else "[red]✗[/red]"
+            message = result.get('error') if result.get('error') else f"Agent {result['agent_name']} deployed successfully"
+            console.print(f"{status} Agent {i}: {message}")
+            
+        # Final summary
+        console.print("\n[bold green]Jenkins infrastructure setup complete![/bold green]")
+        console.print(f"Access Jenkins at: http://localhost:{jenkins_master.host_port}")
+        console.print(f"Username: {admin_user}")
+        console.print(f"Password: {admin_password}")
+        console.print("\nUse the following commands to manage your infrastructure:")
+        console.print("  jenkins-local-init master status - Check Jenkins master status")
+        console.print("  jenkins-local-init agent list - List all agents")
+        console.print("  jenkins-local-init agent logs - View agent logs")
+        
     except Exception as e:
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
 
