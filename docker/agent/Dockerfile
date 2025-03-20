@@ -1,11 +1,10 @@
-FROM jenkins/ssh-agent:latest-jdk11
+FROM jenkins/ssh-agent:latest-jdk17
 
 USER root
 
-# Install Java and other required packages
+# Install required packages
 RUN apt-get update && \
     apt-get install -y \
-        openjdk-11-jdk \
         apt-transport-https \
         ca-certificates \
         curl \
@@ -25,12 +24,13 @@ RUN apt-get update && \
     # Add jenkins user to daemon group (GID 1) for Docker socket access
     usermod -aG daemon jenkins && \
     # Allow jenkins to use sudo without password for specific commands
-    echo "jenkins ALL=(ALL) NOPASSWD: /usr/bin/chmod, /usr/sbin/sshd" >> /etc/sudoers && \
+    echo "jenkins ALL=(ALL) NOPASSWD: /usr/bin/chmod, /usr/sbin/sshd, /bin/mkdir, /bin/chmod" >> /etc/sudoers && \
     # Fix permissions and generate SSH host keys
     mkdir -p /etc/ssh /run/sshd && \
     ssh-keygen -A && \
     chown -R jenkins:jenkins /etc/ssh && \
-    chown -R jenkins:jenkins /run/sshd && \
+    chmod 755 /run/sshd && \
+    chown root:root /run/sshd && \
     # Fix environment file permissions
     touch /etc/environment && \
     chown jenkins:jenkins /etc/environment && \

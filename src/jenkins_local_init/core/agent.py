@@ -89,8 +89,8 @@ class JenkinsAgent:
         # Configure the agent in Jenkins master
         jenkins_success, jenkins_message = self.agent_configurator.configure_agent(
             agent_name,
-            "localhost",  # Since we're running locally
-            ssh_port     # Dynamic SSH port
+            agent_name,  # Use container name for direct Docker network communication
+            22          # Use default SSH port inside container
         )
         result['jenkins_status'] = 'success' if jenkins_success else 'failed'
         

@@ -132,7 +132,7 @@ class JenkinsAgentConfigurator:
         except Exception as e:
             return False, f"Failed to configure credentials: {str(e)}"
 
-    def configure_agent(self, agent_name: str, host: str, port: int) -> Tuple[bool, str]:
+    def configure_agent(self, agent_name: str, host: str = "jenkins-local-agent-1", port: int = 22) -> Tuple[bool, str]:
         """Configure Jenkins agent using SSH."""
         try:
             session = requests.Session()
@@ -164,10 +164,20 @@ class JenkinsAgentConfigurator:
                 "remoteFS": "/home/jenkins",
                 "labelString": "",
                 "mode": "NORMAL",
-                "": ["hudson.slaves.JNLPLauncher", "0"],
+                "": ["hudson.plugins.sshslaves.SSHLauncher", "0"],
                 "launcher": {
-                    "stapler-class": "hudson.slaves.JNLPLauncher",
-                    "$class": "hudson.slaves.JNLPLauncher"
+                    "stapler-class": "hudson.plugins.sshslaves.SSHLauncher",
+                    "$class": "hudson.plugins.sshslaves.SSHLauncher",
+                    "host": host,
+                    "port": port,
+                    "credentialsId": "jenkins-agent-ssh-key",
+                    "launchTimeoutSeconds": "60",
+                    "maxNumRetries": "10",
+                    "retryWaitTime": "15",
+                    "sshHostKeyVerificationStrategy": {
+                        "stapler-class": "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy",
+                        "$class": "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy"
+                    }
                 },
                 "retentionStrategy": {
                     "stapler-class": "hudson.slaves.RetentionStrategy$Always",
@@ -188,17 +198,25 @@ class JenkinsAgentConfigurator:
                 "_.labelString": "",
                 "mode": "NORMAL",
                 "stapler-class": [
-                    "hudson.slaves.JNLPLauncher",
+                    "hudson.plugins.sshslaves.SSHLauncher",
                     "hudson.slaves.RetentionStrategy$Always",
                     "hudson.slaves.SimpleScheduledRetentionStrategy",
                     "hudson.slaves.RetentionStrategy$Demand"
                 ],
                 "$class": [
-                    "hudson.slaves.JNLPLauncher",
+                    "hudson.plugins.sshslaves.SSHLauncher",
                     "hudson.slaves.RetentionStrategy$Always",
                     "hudson.slaves.SimpleScheduledRetentionStrategy",
                     "hudson.slaves.RetentionStrategy$Demand"
                 ],
+                "_.host": host,
+                "_.port": str(port),
+                "_.credentialsId": "jenkins-agent-ssh-key",
+                "_.launchTimeoutSeconds": "60",
+                "_.maxNumRetries": "10",
+                "_.retryWaitTime": "15",
+                "_.sshHostKeyVerificationStrategy": "0",
+                "stapler-class-sshHostKeyVerificationStrategy": "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy",
                 "stapler-class-bag": "true",
                 "_.freeDiskSpaceThreshold": "1GiB",
                 "_.freeDiskSpaceWarningThreshold": "2GiB",

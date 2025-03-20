@@ -17,5 +17,5 @@ if [ -e /var/run/docker.sock ]; then
     fi
 fi
 
-# Start SSHD
-exec /usr/sbin/sshd -D -e
+# Start SSHD with sudo
+exec sudo /usr/sbin/sshd -D -e
