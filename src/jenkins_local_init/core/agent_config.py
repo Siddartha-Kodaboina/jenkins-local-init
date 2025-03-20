@@ -32,10 +32,8 @@ class JenkinsAgentConfigurator:
         if not self.crumb:
             crumb_data = self._get_crumb()
             if crumb_data:
-                print(f"Debug - Got crumb data: {crumb_data}")  # Debug line
                 self.crumb = {crumb_data.get('crumbRequestField'): crumb_data.get('crumb')}
                 headers.update(self.crumb)
-        print(f"Debug - Final headers: {headers}")  # Debug line
         return headers
 
     def configure_credentials(self, private_key_path: Path) -> Tuple[bool, str]:
@@ -47,10 +45,8 @@ class JenkinsAgentConfigurator:
             # First verify if credentials already exist
             verify_url = f"{self.jenkins_url}/manage/credentials/store/system/domain/_/api/json?tree=credentials[id]"
             verify_response = session.get(verify_url)
-            print(f"Debug - Checking existing credentials...")
             if verify_response.status_code == 200:
                 existing_creds = verify_response.json()
-                print(f"Debug - Existing credentials: {json.dumps(existing_creds, indent=2)}")
                 # Check if credentials already exist
                 if any(cred.get("id") == "jenkins-agent-ssh-key" for cred in existing_creds.get("credentials", [])):
                     print("✓ SSH credentials already exist")
@@ -66,13 +62,11 @@ class JenkinsAgentConfigurator:
                 return False, f"Failed to get crumb: {crumb_response.text[:200]}"
             
             crumb_data = crumb_response.json()
-            print(f"Debug - Got crumb: {json.dumps(crumb_data, indent=2)}")
 
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 crumb_data['crumbRequestField']: crumb_data['crumb']
             }
-            print(f"Debug - Using headers: {json.dumps(headers, indent=2)}")
 
             form_data = {
                 'json': json.dumps({
@@ -95,8 +89,6 @@ class JenkinsAgentConfigurator:
             }
 
             create_url = f"{self.jenkins_url}/manage/credentials/store/system/domain/_/createCredentials"
-            print(f"Debug - Creating credentials at URL: {create_url}")
-            print(f"Debug - Form data: {json.dumps(form_data, indent=2)}")
 
             response = session.post(
                 create_url,
@@ -104,22 +96,16 @@ class JenkinsAgentConfigurator:
                 data=form_data
             )
 
-            print(f"Debug - Response status code: {response.status_code}")
-            print(f"Debug - Response content type: {response.headers.get('Content-Type', 'unknown')}")
-            print(f"Debug - Response content: {response.text[:500]}")
 
             # Verify creation
             verify_response = session.get(verify_url)
             if verify_response.status_code == 200:
                 after_creds = verify_response.json()
-                print(f"Debug - Credentials after creation: {json.dumps(after_creds, indent=2)}")
                 
                 # Verify the credentials were actually created
                 if any(cred.get("id") == "jenkins-agent-ssh-key" for cred in after_creds.get("credentials", [])):
-                    print("✓ SSH credentials created successfully")
                     return True, "Credentials configured successfully"
                 else:
-                    print("✗ Credentials not found after creation attempt")
                     return False, "Credentials not found after creation attempt"
 
             if response.status_code in [200, 201, 302]:
@@ -238,10 +224,6 @@ class JenkinsAgentConfigurator:
                 data=form_data,
                 cookies=cookie
             )
-
-            print(f"Debug - Response status code: {response.status_code}")
-            print(f"Debug - Response headers: {dict(response.headers)}")
-            print(f"Debug - Response content: {response.text[:500]}")
 
             if response.status_code in [200, 302]:
                 return True, "Agent configured successfully"
