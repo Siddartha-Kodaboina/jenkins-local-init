@@ -3,6 +3,7 @@ from rich.console import Console
 from rich.traceback import install
 from ..config.manager import ConfigManager
 from pathlib import Path
+import os
 from ..core.docker import DockerManager
 from ..core.jenkins import JenkinsMaster
 from ..core.ssh import SSHKeyManager
@@ -308,7 +309,7 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
         console.print("[green]✓[/green] Initial setup completed")
         
         # Step 5: Install required plugins
-        console.print("\n[bold]Step 5/6: Installing required plugins...[/bold]")
+        console.print("\n[bold]Step 5/7: Installing required plugins...[/bold]")
         
         required_plugins = [
             "credentials",
@@ -326,9 +327,38 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
         else:
             console.print(f"[red]✗[/red] {message}")
             console.print("[yellow]![/yellow] Continuing with setup despite plugin installation issues")
+        
+        # Step 6: Check and build agent image if needed
+        console.print("\n[bold]Step 6/7: Checking Jenkins agent image...[/bold]")
+        
+        # Get the agent image name from config
+        agent_image = agent_manager.image
+        
+        # Check if the image exists
+        if docker_manager.check_image_exists(agent_image):
+            console.print(f"[green]✓[/green] Jenkins agent image '{agent_image}' already exists")
+        else:
+            console.print(f"[yellow]![/yellow] Jenkins agent image '{agent_image}' not found, building it now...")
             
-        # Step 6: Deploy Jenkins agents
-        console.print("\n[bold]Step 6/6: Deploying Jenkins agents...[/bold]")
+            # Get the package directory to find the Dockerfile
+            package_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.parent
+            dockerfile_path = package_dir / "docker" / "agent" / "Dockerfile"
+            
+            if not dockerfile_path.exists():
+                console.print(f"[red]✗[/red] Dockerfile not found at {dockerfile_path}")
+                console.print("[red]✗[/red] Cannot build agent image, setup will likely fail")
+            else:
+                console.print(f"Building image from {dockerfile_path}...")
+                success, message = docker_manager.build_image(dockerfile_path, agent_image)
+                
+                if success:
+                    console.print(f"[green]✓[/green] Successfully built Jenkins agent image")
+                else:
+                    console.print(f"[red]✗[/red] Failed to build agent image: {message}")
+                    console.print("[red]✗[/red] Agent deployment will likely fail")
+            
+        # Step 7: Deploy Jenkins agents
+        console.print("\n[bold]Step 7/7: Deploying Jenkins agents...[/bold]")
         
         agent_manager.agent_configurator = JenkinsAgentConfigurator(
             agent_manager.jenkins_url,
@@ -475,6 +505,30 @@ def deploy(count: int, cpu: str, memory: str, admin_user: str, admin_password: s
             console.print("[red]Error: SSH keys not found[/red]")
             console.print("Generate SSH keys first: jenkins-local-init ssh generate")
             return
+        
+        # Check if agent image exists
+        agent_image = agent_manager.image
+        if not docker_manager.check_image_exists(agent_image):
+            console.print(f"[yellow]Warning: Jenkins agent image '{agent_image}' not found[/yellow]")
+            console.print("Building the image now...")
+            
+            # Get the package directory to find the Dockerfile
+            package_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.parent
+            dockerfile_path = package_dir / "docker" / "agent" / "Dockerfile"
+            
+            if not dockerfile_path.exists():
+                console.print(f"[red]Error: Dockerfile not found at {dockerfile_path}[/red]")
+                console.print("Cannot build agent image. Please check your installation.")
+                return
+            
+            console.print(f"Building image from {dockerfile_path}...")
+            success, message = docker_manager.build_image(dockerfile_path, agent_image)
+            
+            if not success:
+                console.print(f"[red]Error: Failed to build agent image: {message}[/red]")
+                return
+                
+            console.print(f"[green]✓[/green] Successfully built Jenkins agent image")
         
         console.print(f"[bold blue]Deploying {count} Jenkins agent(s)...[/bold blue]")
         
