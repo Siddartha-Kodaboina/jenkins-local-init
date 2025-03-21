@@ -30,6 +30,9 @@ DEFAULT_CONFIG = {
         },
         "volume": {
             "name": "jenkins-local-data"
+        },
+        "ngrok": {
+            "enabled": False
         }
     },
     "directories": {

@@ -11,6 +11,7 @@ A tool for setting up and managing a local Distributed Jenkins Infrastructure wi
 - SSH key generation and management
 - Jenkins plugin installation
 - Agent deployment and management
+- Public URL access via Ngrok for GitHub webhooks
 
 ## Prerequisites
 
@@ -22,6 +23,9 @@ Before using this tool, make sure you have the following installed:
   - [Install Python](https://www.python.org/downloads/)
 - **Git**: Required for cloning the repository
   - [Install Git](https://git-scm.com/downloads)
+- **Ngrok** (Optional): Required for public URL access
+  - [Install Ngrok](https://ngrok.com/download)
+  - You'll need a free Ngrok account and authtoken
 
 ## Installation
 
@@ -78,8 +82,13 @@ python -m jenkins_local_init.cli.main [COMMAND]
 Set up a complete Jenkins infrastructure with a single command:
 
 ```bash
-# If installed as a package:
+# Basic setup with local access only:
 jenkins-local-init setup --agents 3 --memory 2g --cpus 2 --admin-user admin --admin-password admin
+
+# Setup with public URL access via Ngrok (for GitHub webhooks):
+# IMPORTANT: You must first authenticate with Ngrok before using the --public flag
+jenkins-local-init ngrok auth YOUR_NGROK_AUTHTOKEN  # Replace with your token from https://dashboard.ngrok.com/get-started/your-authtoken
+jenkins-local-init setup --agents 3 --memory 2g --cpus 2 --admin-user admin --admin-password admin --public
 
 # If running as a module:
 python -m jenkins_local_init.cli.main setup --agents 3 --memory 2g --cpus 2 --admin-user admin --admin-password admin
@@ -89,9 +98,11 @@ This will:
 1. Initialize configuration directories
 2. Set up Docker network and volume
 3. Generate SSH keys
-4. Deploy Jenkins master
-5. Install required plugins (credentials, ssh, etc.)
-6. Deploy Jenkins agents
+4. Set up Ngrok tunnel (if `--public` flag is used)
+5. Deploy Jenkins master (with public URL configuration if Ngrok is used)
+6. Install required plugins (credentials, ssh, etc.)
+7. Check and build the Jenkins agent image if needed
+8. Deploy Jenkins agents
 
 ## Detailed Usage
 
@@ -111,6 +122,7 @@ Options:
 - `--cpus INTEGER`: Number of CPUs for agents (default: 2)
 - `--admin-user TEXT`: Jenkins admin username (default: admin)
 - `--admin-password TEXT`: Jenkins admin password (default: admin)
+- `--public`: Create a public URL using Ngrok for remote access (requires prior Ngrok authentication)
 
 ### Individual Commands
 
@@ -209,6 +221,13 @@ Here's a complete reference of all available commands:
 - `agent remove`: Remove a specific agent
 - `agent remove-all`: Remove all Jenkins agents
 
+### Ngrok Commands (Public Access)
+
+- `ngrok auth`: Configure Ngrok authentication token (REQUIRED before using `--public` flag)
+- `ngrok start`: Start Ngrok tunnel to Jenkins master
+- `ngrok stop`: Stop Ngrok tunnel
+- `ngrok status`: Check Ngrok tunnel status
+
 ## Plugins
 
 The setup command automatically installs the following plugins:
@@ -219,6 +238,60 @@ The setup command automatically installs the following plugins:
 - SSH Slaves Plugin
 - SSH Agent Plugin
 - SSH Plugin
+
+## GitHub Integration with Ngrok
+
+When developing CI/CD pipelines with Jenkins and GitHub, webhooks require a public URL that GitHub can reach. Since localhost is not accessible from the internet, we've integrated Ngrok to provide a secure public URL for your local Jenkins instance.
+
+### Why Ngrok?
+
+- **GitHub Webhooks**: GitHub needs to send webhook events to your Jenkins instance when code is pushed or PRs are created
+- **No Firewall/Router Configuration**: Works without port forwarding or static IP
+- **Secure Tunnel**: Creates an encrypted tunnel to your localhost
+- **Temporary by Design**: Perfect for development and testing
+
+### Setting Up GitHub Webhooks
+
+1. First, authenticate with Ngrok (this is mandatory):
+   ```bash
+   # Get your token from https://dashboard.ngrok.com/get-started/your-authtoken
+   jenkins-local-init ngrok auth YOUR_NGROK_AUTHTOKEN
+   ```
+
+2. Start your Jenkins with Ngrok:
+   ```bash
+   # During setup (recommended approach)
+   jenkins-local-init setup --agents 2 --public
+   
+   # Or after setup (not recommended, may require manual URL configuration)
+   jenkins-local-init ngrok start
+   ```
+
+2. Copy the public URL provided (e.g., `https://abc123.ngrok.io`)
+
+3. In your GitHub repository:
+   - Go to Settings > Webhooks > Add webhook
+   - Set Payload URL to `https://abc123.ngrok.io/github-webhook/`
+   - Select content type: `application/json`
+   - Choose events to trigger the webhook (usually push, pull requests)
+   - Save the webhook
+
+4. Test the webhook by making a commit or creating a PR
+
+### Ngrok Authentication
+
+**IMPORTANT**: Before using the `--public` flag with the setup command, you MUST authenticate with Ngrok first. This is a mandatory prerequisite.
+
+```bash
+# Get your token from https://dashboard.ngrok.com/get-started/your-authtoken
+jenkins-local-init ngrok auth YOUR_NGROK_AUTHTOKEN
+```
+
+Why this is required:
+- The new implementation starts Ngrok BEFORE Jenkins is deployed
+- Jenkins is configured with the public URL during initialization
+- This ensures webhooks work correctly from the start
+- No need to update the Jenkins URL after deployment
 
 ## Troubleshooting
 
@@ -244,6 +317,14 @@ The setup command automatically installs the following plugins:
    - Error: `Failed to install plugins`
    - Solution: Check Jenkins logs and ensure Jenkins has internet access
 
+6. **Ngrok not installed**
+   - Error: `Ngrok is not installed`
+   - Solution: Install Ngrok using `brew install ngrok/ngrok/ngrok` or download from ngrok.com
+
+7. **Ngrok authentication fails**
+   - Error: `Ngrok is not authenticated`
+   - Solution: Run `jenkins-local-init ngrok auth YOUR_NGROK_AUTHTOKEN`
+
 ### Getting Help
 
 To get help for any command, use the `--help` flag:
@@ -265,6 +346,9 @@ The tool creates the following directory structure in your home directory:
 ├── ssh/              # SSH keys
 │   ├── jenkins_agent     # Private key
 │   └── jenkins_agent.pub # Public key
+├── ngrok/            # Ngrok configuration and logs
+│   ├── auth_token        # Ngrok auth token
+│   └── ngrok.log         # Ngrok logs
 └── backups/          # Backup files
 ```
 

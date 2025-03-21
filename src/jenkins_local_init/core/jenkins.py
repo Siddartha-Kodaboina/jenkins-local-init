@@ -32,8 +32,15 @@ class JenkinsMaster:
         ])
         return success and 'Up' in output
 
-    def deploy(self) -> Tuple[bool, str]:
-        """Deploy Jenkins master container."""
+    def deploy(self, public_url: str = None) -> Tuple[bool, str]:
+        """Deploy Jenkins master container.
+        
+        Args:
+            public_url: Optional public URL for Jenkins (e.g., from Ngrok)
+            
+        Returns:
+            Tuple of (success, message)
+        """
         if self.is_running():
             return True, "Jenkins master is already running"
 
@@ -47,9 +54,18 @@ class JenkinsMaster:
             '-p', f'{self.jnlp_port}:50000',
             '--restart', 'unless-stopped',
             '-e', 'JAVA_OPTS=-Djenkins.install.runSetupWizard=false',
-            '-e', 'JENKINS_OPTS=--argumentsRealm.roles.user=admin --argumentsRealm.passwd.admin=admin --argumentsRealm.roles.admin=admin',
-            self.image
+            '-e', 'JENKINS_OPTS=--argumentsRealm.roles.user=admin --argumentsRealm.passwd.admin=admin --argumentsRealm.roles.admin=admin'
         ]
+        
+        # Add environment variable for public URL if provided
+        if public_url:
+            command.extend([
+                '-e', f'JENKINS_URL={public_url}'
+            ])
+            # Update the instance jenkins_url
+            self.jenkins_url = public_url
+            
+        command.append(self.image)
         
         return self.docker.run_command(command)
 
@@ -129,7 +145,18 @@ class JenkinsMaster:
         if not success:
             return False, "Failed to create init.groovy.d directory"
 
-        # Create initialization script
+        # Create initialization script with URL configuration if available
+        jenkins_url_config = ""
+        if self.jenkins_url and self.jenkins_url != f"http://localhost:{self.host_port}":
+            jenkins_url_config = f"""
+// Configure Jenkins URL
+import jenkins.model.JenkinsLocationConfiguration
+def locationConfig = JenkinsLocationConfiguration.get()
+locationConfig.setUrl("{self.jenkins_url}")
+locationConfig.save()
+println("Jenkins URL configured to: " + locationConfig.getUrl())
+"""
+        
         init_script = f"""
 import jenkins.model.*
 import hudson.security.*
@@ -154,6 +181,8 @@ instance.getInjector().getInstance(AdminWhitelistRule.class).setMasterKillSwitch
 instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 
 instance.save()
+
+{jenkins_url_config}
 """
         
         # Write initialization script to container
@@ -239,4 +268,43 @@ instance.save()
             return False, f"Failed to install plugins: {', '.join(failed_plugins)}"
         
         return True, f"Successfully installed plugins: {', '.join(installed_plugins)}"
+
+    def run_command_in_container(self, command: list, input_data: str = None) -> str:
+        """Run a command inside the Jenkins container.
+        
+        Args:
+            command: The command to run as a list of strings
+            input_data: Optional input data to pass to the command
+            
+        Returns:
+            Command output as a string
+        """
+        if not self.is_running():
+            return "Jenkins master is not running"
+        
+        # Prepare the full command with docker exec
+        full_command = ['docker', 'exec', '-i', self.container_name] + command
+        
+        try:
+            # Run the command and pass input if provided
+            if input_data:
+                process = subprocess.Popen(
+                    full_command,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+                stdout, stderr = process.communicate(input=input_data)
+                if process.returncode != 0:
+                    return f"Command failed: {stderr}"
+                return stdout
+            else:
+                # Run command without input
+                success, output = self.docker.run_command(full_command)
+                if not success:
+                    return f"Command failed: {output}"
+                return output
+        except Exception as e:
+            return f"Error running command: {str(e)}"
 

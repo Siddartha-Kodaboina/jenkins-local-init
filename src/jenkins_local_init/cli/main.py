@@ -9,6 +9,7 @@ from ..core.jenkins import JenkinsMaster
 from ..core.ssh import SSHKeyManager
 from ..core.agent import JenkinsAgent
 from ..core.agent_config import JenkinsAgentConfigurator
+from ..core.ngrok import NgrokManager
 from ..cli.logo import display_logo
 
 # Install rich traceback handling
@@ -19,6 +20,7 @@ docker_manager = DockerManager()
 jenkins_master = JenkinsMaster(docker_manager, config_manager)
 ssh_manager = SSHKeyManager(config_manager)
 agent_manager = JenkinsAgent(docker_manager, config_manager, ssh_manager)
+ngrok_manager = NgrokManager(config_manager)
 
 @click.group()
 @click.version_option(version="0.1.0")
@@ -226,13 +228,18 @@ def volume(action):
     help="Jenkins admin password",
     type=str
 )
-def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: str):
+@click.option(
+    "--public",
+    is_flag=True,
+    help="Create a public URL using Ngrok for remote access"
+)
+def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: str, public: bool):
     """Set up complete Jenkins infrastructure with specified configuration."""
     try:
         console.print("[bold blue]Starting complete Jenkins infrastructure setup...[/bold blue]")
         
         # Step 1: Initialize configuration
-        console.print("\n[bold]Step 1/6: Initializing configuration...[/bold]")
+        console.print("\n[bold]Step 1/8: Initializing configuration...[/bold]")
         config_manager.init_directories()
         
         # Update configuration with CLI parameters
@@ -252,7 +259,7 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
         console.print(f"CPUs: {cpus}")
         
         # Step 2: Initialize Docker resources
-        console.print("\n[bold]Step 2/6: Setting up Docker resources...[/bold]")
+        console.print("\n[bold]Step 2/8: Setting up Docker resources...[/bold]")
         
         # Check Docker daemon
         if not docker_manager.check_docker_running():
@@ -274,7 +281,7 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
             console.print(f"[yellow]![/yellow] Volume setup note: {message}")
             
         # Step 3: Generate SSH keys
-        console.print("\n[bold]Step 3/6: Setting up SSH keys...[/bold]")
+        console.print("\n[bold]Step 3/8: Setting up SSH keys...[/bold]")
         
         if ssh_manager.keys_exist():
             console.print("[green]✓[/green] SSH keys already exist")
@@ -286,11 +293,43 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
                 console.print(f"[red]✗[/red] Failed to generate SSH keys: {message}")
                 return
                 
-        # Step 4: Deploy Jenkins master
-        console.print("\n[bold]Step 4/6: Deploying Jenkins master...[/bold]")
+        # Step 4: Set up Ngrok if public flag is set
+        public_url = None
+        if public:
+            console.print("\n[bold]Step 4/8: Setting up public access with Ngrok...[/bold]")
+            
+            # Check if ngrok is installed
+            if not ngrok_manager.is_installed():
+                console.print("[red]✗[/red] Ngrok is not installed. Please install it first:")
+                console.print("  brew install ngrok/ngrok/ngrok  # macOS with Homebrew")
+                console.print("  or download from https://ngrok.com/download")
+                return
+            
+            # Check if ngrok is authenticated
+            if not ngrok_manager.is_authenticated():
+                console.print("[red]✗[/red] Ngrok is not authenticated. Please run:")
+                console.print("  jenkins-local-init ngrok auth <your-token>")
+                console.print("  Get your token at: https://dashboard.ngrok.com/get-started/your-authtoken")
+                return
+            
+            # Start the tunnel
+            jenkins_port = config_manager.get_config()["infrastructure"]["master"]["port"]
+            success, message = ngrok_manager.start_tunnel(jenkins_port)
+            
+            # Check if tunnel is actually running
+            public_url = ngrok_manager.get_public_url()
+            if public_url:
+                console.print(f"[green]✓[/green] Ngrok tunnel started successfully")
+                console.print(f"Public URL: {public_url}")
+            else:
+                console.print(f"[red]✗[/red] Failed to start ngrok tunnel: {message}")
+                console.print("Continuing setup without public URL...")
+                
+        # Step 5: Deploy Jenkins master (was Step 4)
+        console.print("\n[bold]Step 5/8: Deploying Jenkins master...[/bold]")
         
-        # Deploy master
-        success, message = jenkins_master.deploy()
+        # Deploy master with public URL if available
+        success, message = jenkins_master.deploy(public_url)
         
         if not success:
             console.print(f"[red]✗[/red] Failed to deploy Jenkins master: {message}")
@@ -308,8 +347,8 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
             
         console.print("[green]✓[/green] Initial setup completed")
         
-        # Step 5: Install required plugins
-        console.print("\n[bold]Step 5/7: Installing required plugins...[/bold]")
+        # Step 6: Install required plugins
+        console.print("\n[bold]Step 6/8: Installing required plugins...[/bold]")
         
         required_plugins = [
             "credentials",
@@ -328,8 +367,8 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
             console.print(f"[red]✗[/red] {message}")
             console.print("[yellow]![/yellow] Continuing with setup despite plugin installation issues")
         
-        # Step 6: Check and build agent image if needed
-        console.print("\n[bold]Step 6/7: Checking Jenkins agent image...[/bold]")
+        # Step 7: Check and build agent image if needed
+        console.print("\n[bold]Step 7/8: Checking Jenkins agent image...[/bold]")
         
         # Get the agent image name from config
         agent_image = agent_manager.image
@@ -357,8 +396,8 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
                     console.print(f"[red]✗[/red] Failed to build agent image: {message}")
                     console.print("[red]✗[/red] Agent deployment will likely fail")
             
-        # Step 7: Deploy Jenkins agents
-        console.print("\n[bold]Step 7/7: Deploying Jenkins agents...[/bold]")
+        # Step 8: Deploy Jenkins agents
+        console.print("\n[bold]Step 8/8: Deploying Jenkins agents...[/bold]")
         
         agent_manager.agent_configurator = JenkinsAgentConfigurator(
             agent_manager.jenkins_url,
@@ -382,13 +421,24 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
         # Final summary
         display_logo()
         console.print("\n[bold green]Jenkins infrastructure setup complete![/bold green]")
-        console.print(f"Access Jenkins at: http://localhost:{jenkins_master.host_port}")
-        console.print(f"Username: {admin_user}")
-        console.print(f"Password: {admin_password}")
+        
+        # Display the appropriate URL based on whether we're using Ngrok
+        if public_url:
+            console.print(f"Access Jenkins at: {public_url}")
+            console.print(f"Username: {admin_user}")
+            console.print(f"Password: {admin_password}")
+            console.print("\nUse this URL for GitHub webhooks and remote access.")
+        else:
+            console.print(f"Access Jenkins at: http://localhost:{jenkins_master.host_port}")
+            console.print(f"Username: {admin_user}")
+            console.print(f"Password: {admin_password}")
+        
         console.print("\nUse the following commands to manage your infrastructure:")
         console.print("  jenkins-local-init master status - Check Jenkins master status")
         console.print("  jenkins-local-init agent list - List all agents")
         console.print("  jenkins-local-init agent logs - View agent logs")
+        if public_url:
+            console.print("  jenkins-local-init ngrok status - Check Ngrok tunnel status")
         
     except Exception as e:
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
@@ -645,6 +695,115 @@ def remove_all():
     except Exception as e:
         console.print(f"[bold red]Error: {str(e)}[/bold red]")
 
+
+########################################################
+# Ngrok Commands
+########################################################
+
+@cli.group()
+def ngrok():
+    """Manage Ngrok tunnels for public access to Jenkins."""
+    pass
+
+@ngrok.command("auth")
+@click.argument('token', required=True)
+def ngrok_auth(token):
+    """Configure Ngrok authentication token."""
+    console.print("Configuring Ngrok authentication...", style="bold")
+    
+    success, message = ngrok_manager.authenticate(token)
+    if success:
+        console.print(f"[green]✓[/green] {message}")
+    else:
+        console.print(f"[red]✗[/red] {message}")
+
+@ngrok.command("start")
+@click.option('--admin-user', default='admin', help='Jenkins admin username')
+@click.option('--admin-password', default='admin', help='Jenkins admin password')
+def ngrok_start(admin_user, admin_password):
+    """Start Ngrok tunnel to Jenkins master."""
+    console.print("Starting Ngrok tunnel to Jenkins...", style="bold")
+    
+    # Check if ngrok is installed
+    if not ngrok_manager.is_installed():
+        console.print("[red]✗[/red] Ngrok is not installed. Please install it first:")
+        console.print("  brew install ngrok/ngrok/ngrok  # macOS with Homebrew")
+        console.print("  or download from https://ngrok.com/download")
+        return
+    
+    # Check if ngrok is authenticated
+    if not ngrok_manager.is_authenticated():
+        console.print("[red]✗[/red] Ngrok is not authenticated. Please run:")
+        console.print("  jenkins-local-init ngrok auth <your-token>")
+        console.print("  Get your token at: https://dashboard.ngrok.com/get-started/your-authtoken")
+        return
+    
+    # Check if Jenkins master is running
+    if not jenkins_master.is_running():
+        console.print("[red]✗[/red] Jenkins master is not running. Please start it first:")
+        console.print("  jenkins-local-init master start")
+        return
+    
+    # Start the tunnel
+    jenkins_port = config_manager.get_config()["infrastructure"]["master"]["port"]
+    success, message = ngrok_manager.start_tunnel(jenkins_port)
+    
+    # Check if tunnel is actually running even if the start_tunnel method reported failure
+    public_url = ngrok_manager.get_public_url()
+    if public_url:
+        console.print(f"[green]✓[/green] Ngrok tunnel started successfully")
+        console.print(f"Public URL: {public_url}")
+        
+        # Update Jenkins URL configuration
+        console.print("Updating Jenkins URL configuration...", style="bold")
+        url_success, url_message = ngrok_manager.update_jenkins_url(
+            jenkins_master, admin_user, admin_password
+        )
+        if url_success:
+            console.print(f"[green]✓[/green] {url_message}")
+        else:
+            console.print(f"[yellow]![/yellow] {url_message}")
+            console.print("You may need to manually update the Jenkins URL in the Jenkins configuration.")
+    else:
+        console.print(f"[red]✗[/red] {message}")
+        console.print("Check the logs for more details: ~/.jenkins-local/ngrok/ngrok.log")
+
+@ngrok.command("stop")
+def ngrok_stop():
+    """Stop Ngrok tunnel."""
+    console.print("Stopping Ngrok tunnel...", style="bold")
+    
+    success, message = ngrok_manager.stop_tunnel()
+    if success:
+        console.print(f"[green]✓[/green] {message}")
+    else:
+        console.print(f"[red]✗[/red] {message}")
+
+@ngrok.command("status")
+def ngrok_status():
+    """Check Ngrok tunnel status."""
+    console.print("Checking Ngrok tunnel status...", style="bold")
+    
+    if not ngrok_manager.is_installed():
+        console.print("[red]✗[/red] Ngrok is not installed")
+        return
+    
+    if not ngrok_manager.is_authenticated():
+        console.print("[red]✗[/red] Ngrok is not authenticated")
+        return
+    
+    status = ngrok_manager.get_tunnel_status()
+    if status["running"]:
+        console.print(f"[green]✓[/green] Ngrok tunnel is running")
+        console.print(f"Public URL: {status['public_url']}")
+        
+        # Show tunnel details
+        if status["tunnels"]:
+            console.print("\nActive tunnels:")
+            for tunnel in status["tunnels"]:
+                console.print(f"  - {tunnel['name']}: {tunnel['public_url']} -> {tunnel['config']['addr']}")
+    else:
+        console.print("[yellow]![/yellow] No active Ngrok tunnels")
 
 if __name__ == "__main__":
     cli()
