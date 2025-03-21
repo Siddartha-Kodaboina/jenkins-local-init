@@ -57,6 +57,8 @@ cd jenkins-local-init-django
 4. Enter a name for your pipeline (e.g., "django-example")
 5. Select "Pipeline" and click "OK"
 6. In the configuration page:
+   - Select "Github Project" and paste your forked repository URL
+   - Under "Build Triggers", select "GitHub hook trigger for GITScm polling"
    - Under "Pipeline", select "Pipeline script from SCM"
    - Select "Git" as the SCM
    - Enter the repository URL (your forked repository URL)
