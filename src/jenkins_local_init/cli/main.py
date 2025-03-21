@@ -356,7 +356,12 @@ def setup(agents: int, memory: str, cpus: int, admin_user: str, admin_password: 
             "ssh-credentials",
             "ssh-slaves",
             "ssh-agent",
-            "ssh"
+            "ssh",
+            "pipeline",
+            "workflow-aggregator",
+            "git",
+            "git-client",
+            "github"
         ]
         
         success, message = jenkins_master.install_plugins(admin_user, admin_password, required_plugins)

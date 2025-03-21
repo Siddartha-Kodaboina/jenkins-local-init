@@ -255,7 +255,7 @@ instance.save()
                 failed_plugins.append(f"{plugin} (Error: {str(e)})")
 
         # Wait for plugins to be installed
-        time.sleep(10)
+        time.sleep(100)
         
         # Restart Jenkins to apply plugin changes
         self.restart()

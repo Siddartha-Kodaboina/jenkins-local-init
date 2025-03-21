@@ -14,6 +14,7 @@ setup(
     entry_points={
         "console_scripts": [
             "jenkins-local-init=jenkins_local_init.cli.main:cli",
+            "jnet=jenkins_local_init.cli.main:cli",
         ],
     },
     author="Siddartha Kodaboina",
