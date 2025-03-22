@@ -42,12 +42,12 @@ jnet ngrok status
 # Example output: Public URL: https://abc123.ngrok.io
 ```
 
-### Step 2: Clone This Repository
+### Step 2: Fork This Repository
 
-```bash
-git clone https://github.com/Siddartha-Kodaboina/jenkins-local-init-django.git
-cd jenkins-local-init-django
-```
+1. Open the URL (https://github.com/Siddartha-Kodaboina/jenkins-local-init-django)
+2. Click the "Fork" button
+3. Wait for the fork to complete
+
 
 ### Step 3: Create a Jenkins Pipeline
 
