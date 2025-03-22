@@ -212,7 +212,7 @@ class JenkinsAgentConfigurator:
                 "nodeDescription": "",
                 "numExecutors": "1",
                 "remoteFS": "/home/jenkins",
-                "labelString": "",
+                "labelString": "agent",  # Add 'agent' label to all agents
                 "mode": "NORMAL",
                 "": ["hudson.plugins.sshslaves.SSHLauncher", "0"],
                 "launcher": {
@@ -245,7 +245,7 @@ class JenkinsAgentConfigurator:
                 "nodeDescription": "",
                 "_.numExecutors": "1",
                 "_.remoteFS": "/home/jenkins",
-                "_.labelString": "",
+                "_.labelString": "agent",  # Add 'agent' label to all agents
                 "mode": "NORMAL",
                 "stapler-class": [
                     "hudson.plugins.sshslaves.SSHLauncher",

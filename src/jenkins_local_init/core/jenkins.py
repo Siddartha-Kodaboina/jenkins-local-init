@@ -161,6 +161,8 @@ println("Jenkins URL configured to: " + locationConfig.getUrl())
 import jenkins.model.*
 import hudson.security.*
 import jenkins.security.s2m.AdminWhitelistRule
+import hudson.model.Node.Mode
+import hudson.slaves.NodeProperty
 
 def instance = Jenkins.getInstance()
 
@@ -176,6 +178,14 @@ instance.setAuthorizationStrategy(strategy)
 
 // Enable agent to master security
 instance.getInjector().getInstance(AdminWhitelistRule.class).setMasterKillSwitch(false)
+
+// Configure master node with 'master' label
+def masterNode = instance.getNode("")
+if (masterNode != null) {{  // Double braces to escape in f-string
+    masterNode.setLabelString("master")
+    instance.save()
+    println("Master node labeled as 'master'")
+}}
 
 // Disable setup wizard
 instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)

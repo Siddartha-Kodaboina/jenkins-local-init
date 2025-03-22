@@ -14,14 +14,14 @@ jenkins-local-init-django/
 └── django_app/           # Django project settings
 ```
 
-## Prerequisites
+## Prerequisites 
 
 - [Jenkins Local Init](https://github.com/Siddartha-Kodaboina/jenkins-local-init) installed
 - Jenkins running with Ngrok for public URL access
 - Git installed
 - GitHub account
 
-## Setting Up CI/CD with Jenkins Local Init
+## Setting Up CI/CD with Jenkins Local Init (alias jent)
 
 ### Step 1: Start Jenkins with Ngrok
 
@@ -94,6 +94,24 @@ The Jenkinsfile defines a pipeline with the following stages:
 2. **Build Docker Image**: Builds a Docker image for the application
 3. **Run Tests**: Executes Django tests inside the Docker container
 4. **Deploy**: Placeholder for deployment steps (in a real environment)
+
+### Node Labels
+
+The pipeline is configured to run on nodes with the `agent` label. Jenkins Local Init automatically assigns labels to nodes:
+
+- **Master Node**: Labeled as `master`
+- **Agent Nodes**: Labeled as `agent`
+
+This allows you to control where your builds run. For example, the Jenkinsfile starts with:
+
+```groovy
+pipeline {
+    agent { label 'agent' }
+    // ...
+}
+```
+
+This ensures the pipeline runs on agent nodes, preserving resources on the master node for orchestration.
 
 ## Running the Application Locally
 

@@ -10,7 +10,7 @@ A tool for setting up and managing a local Distributed Jenkins Infrastructure wi
 - Docker network and volume management
 - SSH key generation and management
 - Jenkins plugin installation
-- Agent deployment and management
+- Agent deployment and management with automatic node labeling
 - Public URL access via Ngrok for GitHub webhooks
 
 ## Prerequisites
@@ -99,6 +99,8 @@ This will:
 2. Set up Docker network and volume
 3. Generate SSH keys
 4. Set up Ngrok tunnel (if `--public` flag is used)
+5. Deploy Jenkins master with the label 'master'
+6. Deploy Jenkins agents with the label 'agent'
 5. Deploy Jenkins master (with public URL configuration if Ngrok is used)
 6. Install required plugins (credentials, ssh, etc.)
 7. Check and build the Jenkins agent image if needed
